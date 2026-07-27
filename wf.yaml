@@ -11,3 +11,4 @@ steps:
     type: shell
     command: echo "Goodbye!"
     depends_on: [say-hello]
+  - id: say-goodby
