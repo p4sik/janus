@@ -22,7 +22,7 @@ func (e *Engine) Run(ctx context.Context, wf *workflow.Workflow) error {
 
 	dependents := make(map[string][]string)
 	remainingDependencies := make(map[string]int)
-	// daj mi pelna definicje kroku build
+
 	stepsByID := make(map[string]workflow.Step)
 
 	for _, step := range wf.Steps {
@@ -46,7 +46,6 @@ func (e *Engine) Run(ctx context.Context, wf *workflow.Workflow) error {
 	}
 
 	completed := 0
-	// Wykonujemy kroki w kolejności topologicznej.
 	for len(ready) > 0 {
 		stepID := ready[0]
 		ready = ready[1:]
@@ -62,7 +61,6 @@ func (e *Engine) Run(ctx context.Context, wf *workflow.Workflow) error {
 			return fmt.Errorf("execute step %s: %w", step.ID, err)
 		}
 
-		// Symulujemy sukces kroku.
 		completed++
 
 		for _, dependentID := range dependents[stepID] {
