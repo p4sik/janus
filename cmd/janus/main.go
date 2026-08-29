@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/p4sik/janus/internal/engine"
+	"github.com/p4sik/janus/internal/executor"
+	"github.com/p4sik/janus/internal/validator"
 	"github.com/p4sik/janus/internal/workflow"
 )
 
@@ -23,14 +25,20 @@ func run() error {
 
 	wf, err := workflow.ParseFile(*workflowPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse workflow: %w", err)
 	}
 
-	if err := workflow.Validate(wf); err != nil {
+	executors := map[string]executor.Executor{
+		"command":     &executor.CommandExecutor{},
+		"http":        &executor.HTTPExecutor{},
+		"image_build": &executor.ImageBuildExecutor{},
+	}
+
+	if err := validator.Validate(wf, executors); err != nil {
 		return fmt.Errorf("validate workflow: %w", err)
 	}
 
-	e := engine.New()
+	e := engine.New(executors)
 
 	if err := e.Run(context.Background(), wf); err != nil {
 		return fmt.Errorf("run workflow: %w", err)
